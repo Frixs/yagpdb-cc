@@ -19,13 +19,13 @@
 
 {{ if gt (len .Message.Embeds) 0 }}
     {{ $user := userArg (index .Message.Embeds 0).Description }}
+    {{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $user.ID) "/" $user.Avatar ".png") }}
 
     {{ if eq .Reaction.Emoji.Name $reaction_emoji_name_1 }}
         {{ giveRoleID $user.ID $role_id }}
 
-        {{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $user.ID) "/" $user.Avatar ".png") }}
         {{ $embed := cembed  
-            "description" (joinStr "" .User.Mention " **granted full access** to " $user.Mention "!" )
+            "description" (joinStr "" .User.Mention " **granted** full access to " $user.Mention "!" )
             "color" 16777215
             "author" (sdict "name" $user.String "icon_url" $avatar) 
             "timestamp" .ReactionMessage.Timestamp
@@ -54,6 +54,15 @@
         {{ deleteMessage $channel_welcome $welcome_msg_id 43200 }}
         
     {{ else if eq .Reaction.Emoji.Name $reaction_emoji_name_2 }}
+        {{ $embed := cembed  
+            "description" (joinStr "" .User.Mention " **rejected** full access to " $user.Mention "!" )
+            "color" 16777215
+            "author" (sdict "name" $user.String "icon_url" $avatar) 
+            "timestamp" .ReactionMessage.Timestamp
+        }}
+
+        {{ sendMessage $channel_log $embed }}
+
         {{ deleteAllMessageReactions nil .Message.ID }}
         {{ addReactions $reaction_emoji_name_4 }}
     {{ end }}
