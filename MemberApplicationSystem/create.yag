@@ -1,0 +1,31 @@
+{{/*
+	Trigger Type: Reaction (Add only)
+
+	Made by Frixs#8694
+
+    ---
+    Channel/User role restrictions (require): Verified
+    Only run in the following channels: new-access
+*/}}
+
+{{ $channel_log := 907636826947321867 }} {{/* log channel */}}
+
+{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString .User.ID) "/" .User.Avatar ".png") }}
+{{ $embed := cembed  
+	"description" .User.Mention
+	"color" 16620858
+    	"fields" (cslice 
+        	(sdict "name" "Message" "value" .ReactionMessage.Content "inline" false) 
+    	) 
+	"author" (sdict "name" .User.String "icon_url" $avatar) 
+	"timestamp" .ReactionMessage.Timestamp
+}}
+ 
+{{ if eq .ReactionMessage.Author.ID .User.ID }} 
+    {{ $msg_id := (sendMessageRetID $channel_log $embed) }}
+    {{ deleteMessage nil .ReactionMessage.ID 0 }}
+    {{ sleep 1 }}
+    {{ addMessageReactions $channel_log $msg_id "✅" "❎" }}
+    {{ $msg_response := (sendMessageRetID nil "**Tvá zpráva byla úspěšně odeslána! Ostatní již pracují na tvém udělení plného přístupu do komunity. Případně se ozvi.** :slight_smile:") }}
+	{{ deleteMessage nil $msg_response 30 }}
+{{ end }}

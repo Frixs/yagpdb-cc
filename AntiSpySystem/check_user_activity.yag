@@ -18,7 +18,7 @@
 	{{ $dbEntryID := "activity" }}
 	{{ $ccScheduleKey := (joinStr "-" $dbEntryID $user.ID) }}
 
-	{{ if not (dbCount (sdict "userID" $user.ID "pattern" $dbEntryID)) }}
+	{{ if or (targetHasRoleID $user.ID $inactiveRID) (not (dbCount (sdict "userID" $user.ID "pattern" $dbEntryID))) }}
 		{{ $activityReferenceText := "" }}
 		{{ if eq $activityType "voice" }}
 			{{ $activityReferenceText = (joinStr "" "<#" $activityCID ">" " *(" $activityType ")*") }}
@@ -38,9 +38,8 @@
 		}}
 
 		{{ sendMessage $logCID $logEmbed }}
+		{{ takeRoleID $user.ID $inactiveRID }}
 	{{ end }}
-
-	{{ takeRoleID $user.ID $inactiveRID }}
 
 	{{ cancelScheduledUniqueCC $setUserInactiveCCID $ccScheduleKey }}
 	{{ scheduleUniqueCC $setUserInactiveCCID nil $expiration $ccScheduleKey (sdict "userid" $user.ID) }}
