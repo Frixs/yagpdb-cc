@@ -1,0 +1,15 @@
+{{/*
+	Trigger Type: User Leave Message
+
+	Made by Frixs#8694
+*/}}
+
+{{ $setUserInactiveCCID := 17 }}
+
+{{ $user := .User }}
+
+{{ $dbEntryID := "activity" }}
+{{ $ccScheduleKey := (joinStr "-" $dbEntryID $user.ID) }}
+
+{{ cancelScheduledUniqueCC $setUserInactiveCCID $ccScheduleKey }}
+{{ dbSetExpire $user.ID $dbEntryID 0 0 }}
