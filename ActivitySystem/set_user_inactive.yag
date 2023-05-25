@@ -1,0 +1,24 @@
+{{/*
+	Trigger Type: Command
+
+	Made by Frixs#8694
+*/}}
+
+{{ $inactiveRID := 1109058797835653180 }}
+{{ $logCID := 381489970474516482 }} {{/* Log channel ID */}}
+
+{{ $member := 0 }}
+{{ if .ExecData }}
+	{{ $member = (getMember .ExecData.userid) }}
+
+	{{ $avatarUrl := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $member.User.ID) "/" $member.User.Avatar ".png") }}
+	{{ $logEmbed := cembed  
+		"description" (joinStr " " $member.User.Mention "**is becoming inactive!**")
+		"color" 16252672
+		"author" (sdict "name" $member.User.String "icon_url" $avatarUrl) 
+		"timestamp" .ReactionMessage.Timestamp
+	}}
+
+    {{ giveRoleID $member.User.ID $inactiveRID }}
+	{{ sendMessage $logCID $logEmbed }}
+{{ end }}

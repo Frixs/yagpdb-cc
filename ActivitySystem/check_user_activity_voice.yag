@@ -1,0 +1,59 @@
+{{/*
+	Trigger Type: Minute interval
+	Interval: 5
+	Channel: None
+
+	Made by Frixs#8694
+*/}}
+
+{{ $checkUserActivityCCID := 1 }}
+
+{{ $afkCID := .Guild.AfkChannelID }}
+{{ $currentTime := currentTime.UTC }}
+{{ $dbEntryID := "activity_voice_queue" }}
+
+{{/* get the queue, if any */}}
+{{ $queueEntry := dbGet 0 $dbEntryID }}
+{{ $queue := sdict }}
+{{ if $queueEntry }}
+	{{ $queue = $queueEntry.Value }}
+{{ end }}
+
+{{/* add newly recorded voice users to the queue, increase his priority if the user is still in */}}
+{{ range .Guild.VoiceStates }}
+	{{ $key := toString .UserID }}
+	{{ $cid := .ChannelID }}
+	{{ if and (not (getMember .UserID).User.Bot) (ne $cid $afkCID) }}
+		{{ with $queue.HasKey $key }}
+			{{ $queue.Set $key (sdict "priority" (add (($queue.Get $key).Get "priority") 1) "channelid" $cid "time" $currentTime) }} 
+		{{ else }}
+			{{ $queue.Set $key (sdict "priority" 0 "channelid" $cid "time" $currentTime) }} 
+		{{ end }}
+	{{ end }}
+{{ end }}
+
+{{ if gt (len $queue) 0 }}
+	{{/* sort the queue to get the highest prioritized user */}}
+	{{ $queueSorter := cslice }}
+	{{ range $key, $value := $queue }} 
+		{{ $queueSorter = $queueSorter.Append (sdict "useridstr" $key "priority" ($value.Get "priority") "channelid" ($value.Get "channelid") "time" ($value.Get "time")) }} 
+	{{ end }}
+	{{ $processRecord := index (sort $queueSorter (sdict "key" "priority" "reverse" true)) 0 }}
+	{{ $processUserIDStr := $processRecord.Get "useridstr" }}
+	{{ $processChannelID := $processRecord.Get "channelid" }}
+	{{ $processTime := $processRecord.Get "time" }}
+
+	{{/* remove processing record */}}
+	{{ $queue.Del $processUserIDStr }}
+
+	{{/* increase priority for users that are waitting for processing */}}
+	{{ range $key, $value := $queue }}
+		{{ $queue.Set $key (sdict "priority" (add (($queue.Get $key).Get "priority") 1) "channelid" (($queue.Get $key).Get "channelid") "time" (($queue.Get $key).Get "time")) }} 
+	{{ end }}
+
+	{{/* save the queue */}}
+	{{ dbSet 0 $dbEntryID $queue }}
+
+	{{/* process single user only due to the CC limitations */}}
+	{{ execCC $checkUserActivityCCID nil 0 (sdict "user" (getMember $processUserIDStr).User "type" "voice" "channelid" $processChannelID "time" $processTime) }}
+{{ end }}

@@ -1,0 +1,11 @@
+{{/*
+	Trigger Type: Reaction (Add only)
+
+	Made by Frixs#8694
+*/}}
+
+{{ $checkUserActivityCCID := 1 }}
+
+{{ $currentTime := currentTime.UTC }}
+
+{{ execCC $checkUserActivityCCID nil 0 (sdict "user" .User "type" "reaction" "channelid" .Message.ChannelID "time" $currentTime) }}

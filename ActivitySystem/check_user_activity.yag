@@ -1,0 +1,47 @@
+{{/*
+	Trigger Type: Command
+
+	Made by Frixs#8694
+*/}}
+
+{{ $expiration := 2 }} {{/* expiration set to 2 months (= 5184000 seconds) */}}
+{{ $inactiveRID := 1109058797835653180 }}
+{{ $logCID := 381489970474516482 }} {{/* log channel ID */}}
+{{ $setUserInactiveCCID := 3 }}
+
+{{ if .ExecData }}
+	{{ $user := .ExecData.user }}
+	{{ $activityType := .ExecData.type }}
+	{{ $activityCID := .ExecData.channelid }}
+	{{ $activityTime := .ExecData.time }}
+
+	{{ $dbEntryID := "activity" }}
+	{{ $ccScheduleKey := (joinStr "-" $dbEntryID $user.ID) }}
+
+	{{ if not (dbCount (sdict "userID" $user.ID "pattern" $dbEntryID)) }}
+		{{ $activityReferenceText := "" }}
+		{{ if eq $activityType "voice" }}
+			{{ $activityReferenceText = (joinStr "" "<#" $activityCID ">" " *(" $activityType ")*") }}
+		{{ else }}
+			{{ $activityReferenceText = (joinStr "" "<#" $activityCID ">" "**/**" .Message.Link " *(" $activityType ")*") }}
+		{{ end }}
+
+		{{ $avatarUrl := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $user.ID) "/" $user.Avatar ".png") }}
+		{{ $logEmbed := cembed  
+			"description" (joinStr " " $user.Mention "**is back active!**")
+			"color" 9568000
+			"fields" (cslice 
+				(sdict "name" " " "value" $activityReferenceText "inline" false)
+			)
+			"author" (sdict "name" $user.String "icon_url" $avatarUrl) 
+			"timestamp" $activityTime
+		}}
+
+		{{ takeRoleID $user.ID $inactiveRID }}
+		{{ sendMessage $logCID $logEmbed }}
+	{{ end }}
+
+	{{ cancelScheduledUniqueCC $setUserInactiveCCID $ccScheduleKey }}
+	{{ scheduleUniqueCC $setUserInactiveCCID nil $expiration $ccScheduleKey (sdict "userid" $user.ID) }}
+	{{ dbSetExpire $user.ID $dbEntryID 1 $expiration }}
+{{ end }}
