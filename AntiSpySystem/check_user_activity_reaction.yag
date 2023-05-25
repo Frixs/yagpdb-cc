@@ -4,7 +4,7 @@
 	Made by Frixs#8694
 */}}
 
-{{ $checkUserActivityCCID := 1 }}
+{{ $checkUserActivityCCID := 18 }}
 
 {{ $currentTime := currentTime.UTC }}
 

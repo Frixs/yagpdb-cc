@@ -4,10 +4,10 @@
 	Made by Frixs#8694
 */}}
 
-{{ $expiration := 10 }} {{/* expiration set to 2 months (= 5184000 seconds) */}}
-{{ $inactiveRID := 1109058797835653180 }}
-{{ $logCID := 381489970474516482 }} {{/* log channel ID */}}
-{{ $setUserInactiveCCID := 3 }}
+{{ $expiration := 5184000 }} {{/* expiration set to 2 months (= 5184000 seconds) */}}
+{{ $inactiveRID := 1111378634238869544 }}
+{{ $logCID := 907636826947321867 }} {{/* log channel ID */}}
+{{ $setUserInactiveCCID := 17 }}
 
 {{ if .ExecData }}
 	{{ $user := .ExecData.user }}
