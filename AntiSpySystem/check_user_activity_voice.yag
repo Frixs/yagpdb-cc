@@ -23,7 +23,7 @@
 {{ range .Guild.VoiceStates }}
 	{{ $key := toString .UserID }}
 	{{ $cid := .ChannelID }}
-	{{ if and (not (getMember .UserID).User.Bot) (ne $cid $afkCID) }}
+	{{ if and (getMember .UserID) (not (getMember .UserID).User.Bot) (ne $cid $afkCID) }}
 		{{ with $queue.HasKey $key }}
 			{{ $queue.Set $key (sdict "priority" (add (($queue.Get $key).Get "priority") 1) "channelid" $cid "time" $currentTime) }} 
 		{{ else }}
@@ -55,5 +55,8 @@
 	{{ dbSet 0 $dbEntryID $queue }}
 
 	{{/* process single user only due to the CC limitations */}}
-	{{ execCC $checkUserActivityCCID nil 0 (sdict "user" (getMember $processUserIDStr).User "type" "voice" "channelid" $processChannelID "time" $processTime) }}
+	{{ $processMember := getMember $processUserIDStr }}
+	{{ if $processMember }}
+		{{ execCC $checkUserActivityCCID nil 0 (sdict "user" $processMember.User "type" "voice" "channelid" $processChannelID "time" $processTime) }}
+	{{ end }}
 {{ end }}
