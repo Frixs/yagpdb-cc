@@ -28,7 +28,7 @@
 
 		{{ $avatarUrl := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $user.ID) "/" $user.Avatar ".png") }}
 		{{ $logEmbed := cembed  
-			"description" (joinStr " " $user.Mention "**is back active!**")
+			"description" (joinStr " " $user.Mention "**is now active!**")
 			"color" 9568000
 			"fields" (cslice 
 				(sdict "name" " " "value" $activityReferenceText "inline" false)
