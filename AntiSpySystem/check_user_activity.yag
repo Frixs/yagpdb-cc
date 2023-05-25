@@ -37,9 +37,10 @@
 			"timestamp" $activityTime
 		}}
 
-		{{ takeRoleID $user.ID $inactiveRID }}
 		{{ sendMessage $logCID $logEmbed }}
 	{{ end }}
+
+	{{ takeRoleID $user.ID $inactiveRID }}
 
 	{{ cancelScheduledUniqueCC $setUserInactiveCCID $ccScheduleKey }}
 	{{ scheduleUniqueCC $setUserInactiveCCID nil $expiration $ccScheduleKey (sdict "userid" $user.ID) }}
