@@ -25,7 +25,7 @@
 
         {{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $user.ID) "/" $user.Avatar ".png") }}
         {{ $embed := cembed  
-            "description" (joinStr "" "Náborář " .User.Mention " **udělil oprávnění pro vstup** uživateli " $user.Mention "!" )
+            "description" (joinStr "" .User.Mention " **granted full access** to " $user.Mention "!" )
             "color" 16777215
             "author" (sdict "name" $user.String "icon_url" $avatar) 
             "timestamp" .ReactionMessage.Timestamp

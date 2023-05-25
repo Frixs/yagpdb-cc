@@ -1,0 +1,91 @@
+{{/*
+	Trigger Type: Reaction (Add only)
+
+	Made by Frixs#8694
+
+    ---
+    Only run in the following channels: module-entry
+*/}}
+
+{{ $d_entry_delay_unix := 1800 }} {{/* cooldown on requesting new application to given module */}}
+{{ $color_module := 5763719 }}
+{{ $color_application := 16333359 }}
+{{ $channel := 935592355749298216 }}
+{{ $channel_log := 381193211558887424 }}
+{{ $reaction_emoji_name_1 := "✋" }}
+{{ $reaction_emoji_name_2 := "❌" }}
+{{ $reaction_emoji_name_3 := "✅" }}
+{{ $reaction_emoji_name_4 := "❎" }}
+
+{{ if gt (len .Message.Embeds) 0 }}
+	{{ deleteMessageReaction nil .Message.ID .User.ID $reaction_emoji_name_1 $reaction_emoji_name_2 }}
+	
+	{{ if eq .Reaction.Emoji.Name $reaction_emoji_name_1 }}
+		{{ if eq (index .Message.Embeds 0).Color $color_module }}
+			{{ $creatable := true }}
+			{{ $rid := (getRole (index .Message.Embeds 0).Description).ID }}
+
+			{{ $data_flags := dbGet .User.ID "data_module_entry_flags" }}
+			{{ $data_value := sdict }}
+			{{ if $data_flags }}
+				{{ $data_value = $data_flags.Value }}
+			{{ end }}
+			{{ if $data_value.HasKey (joinStr "" $rid) }}
+				{{ $dtime := $data_value.Get (joinStr "" $rid) }}
+				{{ if gt $dtime (sub currentTime.UTC.Unix $d_entry_delay_unix) }}
+					{{ $creatable = false }}
+				{{ end }}
+			{{ end }}
+			{{ if (targetHasRoleID .User.ID $rid) }}
+				{{ $creatable = false }}
+			{{ end }}
+
+			{{ if $creatable }}
+				{{ $data_value.Set (joinStr "" $rid) currentTime.UTC.Unix }}
+				{{ dbSet .User.ID "data_module_entry_flags" $data_value }}
+
+				{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString .User.ID) "/" .User.Avatar ".png") }}
+				{{ $embed := cembed  
+					"title" "Žádost o přístup"
+					"fields" (cslice 
+							(sdict "name" "Modul" "value" (getRole $rid).Mention "inline" false) 
+							(sdict "name" "Uživatel" "value" .User.Mention "inline" false) 
+						)
+					"color" $color_application
+					"footer" (sdict 
+						"text" .User.String 
+						"icon_url" $avatar
+					) 
+					"timestamp" .ReactionMessage.Timestamp
+				}}
+				{{ $msg_id := (sendMessageRetID $channel $embed) }}
+				{{ sleep 1 }}
+				{{ addMessageReactions $channel $msg_id $reaction_emoji_name_3 $reaction_emoji_name_4 }}
+			{{ else }}
+				{{ sendDM "Žádost o vstup byla nedávno odeslána nebo jsi již členem. Zkus to prosím později. 🙂" }}
+			{{ end }}
+		{{ end }}
+
+	{{ else if eq .Reaction.Emoji.Name $reaction_emoji_name_2 }}
+		{{ if eq (index .Message.Embeds 0).Color $color_module }}
+			{{ $rid := (getRole (index .Message.Embeds 0).Description).ID }}
+			
+			{{ if (targetHasRoleID .User.ID $rid) }}
+				{{ takeRoleID .User.ID $rid }}
+
+				{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString .User.ID) "/" .User.Avatar ".png") }}
+				{{ $embed := cembed  
+					"description" (joinStr "" .User.Mention " **left** module " (getRole $rid).Mention "." )
+					"color" $color_module
+					"footer" (sdict 
+						"text" .User.String 
+						"icon_url" $avatar
+					) 
+					"timestamp" .ReactionMessage.Timestamp
+				}}
+				{{ sendMessage $channel_log $embed }}
+			{{ end }}
+		{{ end }}
+
+	{{ end }}
+{{ end }}

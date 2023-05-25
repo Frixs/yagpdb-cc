@@ -1,0 +1,32 @@
+{{/*
+	Trigger: createmodulecontrol
+	Trigger Type: Command
+
+	Made by Frixs#8694
+
+    ---
+    Channel/User role restrictions (require): Administrator, Moderator
+    Only run in the following channels: module-entry
+*/}}
+
+{{$args := parseArgs 2 "<title> <role>"
+    (carg "string" "Title of the module")
+    (carg "role" "Role of the module")
+}}
+
+{{ $presentation_channel := 935592355749298216 }}
+
+{{ if eq "/" (reFind "/" ($args.Get 1).Name) }}
+    {{$embed := cembed  
+        "title" ($args.Get 0)
+        "description" ($args.Get 1).Mention
+        "color" 5763719
+    }}
+    {{ $msg_id := (sendMessageRetID $presentation_channel $embed) }}
+    {{ sleep 1 }}
+    {{ addMessageReactions $presentation_channel $msg_id "✋" "❌" }}
+{{ else }}
+    {{ "Invalid role!" }}
+{{ end }}
+{{ deleteTrigger }}
+{{ deleteResponse }}

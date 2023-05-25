@@ -1,0 +1,65 @@
+{{/*
+	Trigger: modulekick
+	Trigger Type: Command
+
+	Made by Frixs#8694
+
+    ---
+    Channel/User role restrictions (require): Administrator, Moderator, Ambasador
+*/}}
+
+{{$args := parseArgs 2 "<@user> <@role>"
+    (carg "user" "Mention vyhazovaného uživatele")
+    (carg "role" "Mention role modulu, ze které ho vyhodit")
+    (carg "string" "Důvod vyhození (volitelné)")
+}}
+ 
+{{ $admin_role := 868210385994522634 }}
+{{ $moderator_role := 322786608766124032 }}
+{{ $channelID := 381193211558887424 }}
+
+{{ $user := $args.Get 0 }}
+{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $user.ID) "/" $user.Avatar ".png") }}
+{{ $embed := cembed }}
+ 
+{{/* required (to use) ambassador role is set in command settings, not in code */}}
+{{/* only high-placed users or users from the current module can access through */}}
+{{ if or (targetHasRoleID .User.ID ($args.Get 1).ID) (targetHasRoleID .User.ID $admin_role) (targetHasRoleID .User.ID $moderator_role) }}
+    {{ if (hasPrefix ($args.Get 1).Name "/") }}
+        {{ if (targetHasRoleID $user ($args.Get 1).ID) }}
+            {{ if $args.IsSet 2 }} 
+                {{ $embed = cembed  
+                    "description" (joinStr "" .User.Mention " **fired**  " $user.Mention " from module " ($args.Get 1).Mention "!")
+                    "color" 5763719 
+                    "fields" (cslice 
+                            (sdict "name" "Reason" "value" ($args.Get 2) "inline" false)) 
+                    "author" (sdict "name" (joinStr "" $user.String " (" (getMember $user.ID).Nick ")") "icon_url" $avatar) 
+                    "timestamp" .ReactionMessage.Timestamp
+                }}
+            {{ else }}
+                {{ $embed = cembed  
+                    "description" (joinStr "" .User.Mention " **fired**  " $user.Mention " from module " ($args.Get 1).Mention "!")
+                    "color" 5763719 
+                    "author" (sdict "name" (joinStr "" $user.String " (" (getMember $user.ID).Nick ")") "icon_url" $avatar) 
+                    "timestamp" .ReactionMessage.Timestamp
+                }}
+            {{ end }}
+            
+            {{ if eq $user.ID .User.ID }}
+            **You cannot fire yourself!**
+            {{ else if $user.Bot }}
+            **You cannot fire bot!**
+            {{ else }}
+                {{ takeRoleID $user.ID ($args.Get 1).ID }}
+                {{ sendMessage $channelID $embed }}
+            **Fired!**
+            {{ end }}
+        {{ else }}
+        **The user is not member of that module!**
+        {{ end }}
+    {{ end }}
+{{ else }}
+**You do not have permissions to do that**
+{{ end }}
+{{ deleteResponse 5 }}
+{{ deleteTrigger 5 }}
