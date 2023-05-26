@@ -30,6 +30,9 @@
 		{{ end }}
 
 		{{ $avatarUrl := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $user.ID) "/" $user.Avatar ".png") }}
+		{{ $ex := or (and (reFind "a_" .Guild.Icon) "gif" ) "png" }}
+		{{ $giconUrl := print "https://cdn.discordapp.com/icons/" .Guild.ID "/" .Guild.Icon "." $ex "?size=1024" }}
+
 		{{ $logEmbed := cembed  
 			"description" (joinStr " " $user.Mention "**is now active!**")
 			"color" 9568000
@@ -39,7 +42,19 @@
 			"author" (sdict "name" $user.String "icon_url" $avatarUrl) 
 			"timestamp" $activityTime
 		}}
+		{{ $dmEmbed := cembed
+			"title" "**THE COMMUNITY GREETS**"
+			"description" "You are now an active member, welcome!"
+			"color" 0
+			"thumbnail" (sdict "url" $giconUrl)
+			"image" (sdict "url" "https://media.discordapp.net/attachments/639725322778181632/1111611468773859349/active.gif")
+			"fields" (cslice 
+				(sdict "name" " " "value" "*You might need to restart the Discord app in order to get access to read text channels history.*" "inline" false)
+			)
+			"timestamp" $activityTime
+		}}
 
+		{{ sendDM $dmEmbed }}
 		{{ sendMessage $logCID $logEmbed }}
 		{{ takeRoleID $user.ID $inactiveRID }}
 	{{ end }}
