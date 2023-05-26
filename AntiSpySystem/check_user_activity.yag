@@ -44,7 +44,7 @@
 		}}
 		{{ $dmEmbed := cembed
 			"title" "**THE COMMUNITY GREETS**"
-			"description" "You are now an active member, welcome!"
+			"description" "You are now active, welcome!"
 			"color" 0
 			"thumbnail" (sdict "url" $giconUrl)
 			"image" (sdict "url" "https://media.discordapp.net/attachments/639725322778181632/1111611468773859349/active.gif")
