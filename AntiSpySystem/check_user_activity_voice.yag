@@ -57,6 +57,6 @@
 	{{/* process single user only due to the CC limitations */}}
 	{{ $processMember := getMember $processUserIDStr }}
 	{{ if $processMember }}
-		{{ execCC $checkUserActivityCCID nil 0 (sdict "user" $processMember.User "type" "voice" "channelid" $processChannelID "time" $processTime) }}
+		{{ execCC $checkUserActivityCCID nil 0 (sdict "user" $processMember.User "type" "voice" "desc" nil "channelid" $processChannelID "time" $processTime) }}
 	{{ end }}
 {{ end }}

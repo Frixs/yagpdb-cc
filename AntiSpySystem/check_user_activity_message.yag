@@ -9,4 +9,4 @@
 
 {{ $currentTime := currentTime.UTC }}
 
-{{ execCC $checkUserActivityCCID nil 0 (sdict "user" .User "type" "message" "channelid" .Message.ChannelID "time" $currentTime) }}
+{{ execCC $checkUserActivityCCID nil 0 (sdict "user" .User "type" "message" "desc" nil "channelid" .Message.ChannelID "time" $currentTime) }}

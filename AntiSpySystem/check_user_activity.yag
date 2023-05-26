@@ -12,6 +12,7 @@
 {{ if .ExecData }}
 	{{ $user := .ExecData.user }}
 	{{ $activityType := .ExecData.type }}
+	{{ $activityDescription := .ExecData.desc }}
 	{{ $activityCID := .ExecData.channelid }}
 	{{ $activityTime := .ExecData.time }}
 
@@ -20,10 +21,12 @@
 
 	{{ if or (targetHasRoleID $user.ID $inactiveRID) (not (dbCount (sdict "userID" $user.ID "pattern" $dbEntryID))) }}
 		{{ $activityReferenceText := "" }}
+		{{ $descText := "" }}
+	{{ if $activityDescription }} {{ $descText = (joinStr "" "**/**" $activityDescription) }} {{ end }}
 		{{ if eq $activityType "voice" }}
-			{{ $activityReferenceText = (joinStr "" "<#" $activityCID ">" " *(" $activityType ")*") }}
+			{{ $activityReferenceText = (joinStr "" "<#" $activityCID ">" $descText " *(" $activityType ")*") }}
 		{{ else }}
-			{{ $activityReferenceText = (joinStr "" "<#" $activityCID ">" "**/**" .Message.Link " *(" $activityType ")*") }}
+			{{ $activityReferenceText = (joinStr "" "<#" $activityCID ">" "**/**" .Message.Link $descText " *(" $activityType ")*") }}
 		{{ end }}
 
 		{{ $avatarUrl := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $user.ID) "/" $user.Avatar ".png") }}
