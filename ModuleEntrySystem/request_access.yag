@@ -46,10 +46,10 @@
 
 				{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString .User.ID) "/" .User.Avatar ".png") }}
 				{{ $embed := cembed  
-					"title" "Žádost o přístup"
+					"title" "Module access request"
 					"fields" (cslice 
-							(sdict "name" "Modul" "value" (getRole $rid).Mention "inline" false) 
-							(sdict "name" "Uživatel" "value" .User.Mention "inline" false) 
+							(sdict "name" "Module" "value" (getRole $rid).Mention "inline" false) 
+							(sdict "name" "Member" "value" .User.Mention "inline" false) 
 						)
 					"color" $color_application
 					"footer" (sdict 
@@ -75,6 +75,7 @@
 
 				{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString .User.ID) "/" .User.Avatar ".png") }}
 				{{ $embed := cembed  
+					"title" "**Module Access**"
 					"description" (joinStr "" .User.Mention " **left** module " (getRole $rid).Mention "." )
 					"color" $color_module
 					"footer" (sdict 

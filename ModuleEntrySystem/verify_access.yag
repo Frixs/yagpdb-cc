@@ -3,9 +3,9 @@
 
 	Made by Frixs#8694
 
-    ---
-    Channel/User role restrictions (require): Administrator, Moderator, Ambasador
-    Only run in the following channels: module-entry
+	---
+	Channel/User role restrictions (require): Administrator, Moderator, Ambasador
+	Only run in the following channels: module-entry
 */}}
 
 {{ $color_module := 5763719 }}
@@ -18,44 +18,46 @@
 {{ $moderator_role := 322786608766124032 }}
 
 {{ if gt (len .Message.Embeds) 0 }}
-    {{ if eq (index .Message.Embeds 0).Color $color_application }}
-        {{ $rid := (getRole (index (index .Message.Embeds 0).Fields 0).Value).ID }}
+	{{ if eq (index .Message.Embeds 0).Color $color_application }}
+		{{ $rid := (getRole (index (index .Message.Embeds 0).Fields 0).Value).ID }}
 		{{ $uid := (userArg (index (index .Message.Embeds 0).Fields 1).Value).ID }}
 
-        {{/* required (to use) ambassador role is set in command settings, not in code */}}
-        {{/* only high-placed users or users from the current module can access through */}}
-        {{ if or (targetHasRoleID .User.ID $rid) (targetHasRoleID .User.ID $admin_role) (targetHasRoleID .User.ID $moderator_role) }}
-            {{ if eq .Reaction.Emoji.Name $reaction_emoji_name_3 }}
-                {{ if not (targetHasRoleID $uid $rid) }}
-                    {{ giveRoleID $uid $rid }}
+		{{/* required (to use) ambassador role is set in command settings, not in code */}}
+		{{/* only high-placed users or users from the current module can access through */}}
+		{{ if or (targetHasRoleID .User.ID $rid) (targetHasRoleID .User.ID $admin_role) (targetHasRoleID .User.ID $moderator_role) }}
+			{{ if eq .Reaction.Emoji.Name $reaction_emoji_name_3 }}
+				{{ if not (targetHasRoleID $uid $rid) }}
+					{{ giveRoleID $uid $rid }}
 
-                    {{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $uid) "/" (userArg $uid).Avatar ".png") }}
-                    {{ $embed := cembed  
-                        "description" (joinStr "" .User.Mention " **granted** access to " (userArg $uid).Mention " to module " (getRole $rid).Mention "." )
-                        "color" $color_module
-                        "author" (sdict "name" (userArg $uid).String "icon_url" $avatar) 
-                        "timestamp" .ReactionMessage.Timestamp
-                    }}
-                    {{ sendMessage $channel_log $embed }}
-                {{ end }}
-                {{ deleteMessage nil .ReactionMessage.ID 0 }}
-                {{ dbDel $uid "data_module_entry_flags" }}
-            
-            {{ else if eq .Reaction.Emoji.Name $reaction_emoji_name_4 }}	
-                {{ if not (targetHasRoleID $uid $rid) }}
-                    {{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $uid) "/" (userArg $uid).Avatar ".png") }}
-                    {{ $embed := cembed  
-                        "description" (joinStr "" .User.Mention " **rejected** access to " (userArg $uid).Mention " to module " (getRole $rid).Mention "." )
-                        "color" $color_module
-                        "author" (sdict "name" (userArg $uid).String "icon_url" $avatar) 
-                        "timestamp" .ReactionMessage.Timestamp
-                    }}
-                    {{ sendMessage $channel_log $embed }}
-                {{ end }}
-                {{ deleteMessage nil .ReactionMessage.ID 0 }}
-            {{ end }}
-        {{ else }}
-            {{/* do nothing */}}
-        {{ end }}
-    {{ end }}
+					{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $uid) "/" (userArg $uid).Avatar ".png") }}
+					{{ $embed := cembed  
+						"title" "**Module Access**"
+						"description" (joinStr "" .User.Mention " **granted** access to " (userArg $uid).Mention " to module " (getRole $rid).Mention "." )
+						"color" $color_module
+						"author" (sdict "name" (userArg $uid).String "icon_url" $avatar) 
+						"timestamp" .ReactionMessage.Timestamp
+					}}
+					{{ sendMessage $channel_log $embed }}
+				{{ end }}
+				{{ deleteMessage nil .ReactionMessage.ID 0 }}
+				{{ dbDel $uid "data_module_entry_flags" }}
+
+			{{ else if eq .Reaction.Emoji.Name $reaction_emoji_name_4 }}	
+				{{ if not (targetHasRoleID $uid $rid) }}
+					{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $uid) "/" (userArg $uid).Avatar ".png") }}
+					{{ $embed := cembed
+						"title" "**Module Access**"
+						"description" (joinStr "" .User.Mention " **rejected** access to " (userArg $uid).Mention " to module " (getRole $rid).Mention "." )
+						"color" $color_module
+						"author" (sdict "name" (userArg $uid).String "icon_url" $avatar) 
+						"timestamp" .ReactionMessage.Timestamp
+					}}
+					{{ sendMessage $channel_log $embed }}
+				{{ end }}
+				{{ deleteMessage nil .ReactionMessage.ID 0 }}
+			{{ end }}
+		{{ else }}
+			{{/* do nothing */}}
+		{{ end }}
+	{{ end }}
 {{ end }}

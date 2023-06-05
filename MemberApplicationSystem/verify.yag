@@ -3,9 +3,9 @@
 
 	Made by Frixs#8694
 
-    ---
-    Channel/User role restrictions (require): Administrator, Moderator, Officer
-    Only run in the following channels: newcomers
+	---
+	Channel/User role restrictions (require): Administrator, Moderator, Officer
+	Only run in the following channels: newcomers
 */}}
 
 {{ $channel_log := 907636826947321867 }} {{/* log channel */}}
@@ -18,52 +18,54 @@
 {{ $reaction_emoji_name_4 := "🔴" }} {{/* mark the application as rejected */}}
 
 {{ if gt (len .Message.Embeds) 0 }}
-    {{ $user := userArg (index .Message.Embeds 0).Description }}
-    {{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $user.ID) "/" $user.Avatar ".png") }}
+	{{ $user := userArg (index .Message.Embeds 0).Description }}
+	{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $user.ID) "/" $user.Avatar ".png") }}
 
-    {{ if eq .Reaction.Emoji.Name $reaction_emoji_name_1 }}
-        {{ giveRoleID $user.ID $role_id }}
+	{{ if eq .Reaction.Emoji.Name $reaction_emoji_name_1 }}
+		{{ giveRoleID $user.ID $role_id }}
 
-        {{ $embed := cembed  
-            "description" (joinStr "" .User.Mention " **granted** full access to " $user.Mention "!" )
-            "color" 16777215
-            "author" (sdict "name" $user.String "icon_url" $avatar) 
-            "timestamp" .ReactionMessage.Timestamp
-        }}
+		{{ $embed := cembed
+			"title" "**Member Access**"
+			"description" (joinStr "" .User.Mention " **granted** full access to " $user.Mention "!" )
+			"color" 16777215
+			"author" (sdict "name" $user.String "icon_url" $avatar) 
+			"timestamp" .ReactionMessage.Timestamp
+		}}
 
-        {{ sendMessage $channel_log $embed }}
+		{{ sendMessage $channel_log $embed }}
 
-        {{ deleteAllMessageReactions nil .Message.ID }}
-        {{ addReactions $reaction_emoji_name_3 }}
+		{{ deleteAllMessageReactions nil .Message.ID }}
+		{{ addReactions $reaction_emoji_name_3 }}
 
-        {{ $welcomeEmbed := cembed
-            "title" "**Ahoj! ... a vítej!**"
-            "description" (joinStr "" $user.Mention ", s plným oprávněním jsou ti dveře nyní všude otevřené!\nDoufáme, že u nás v komunitě nalezneš mnoho zajímavého a také nové přátele.")
-            "color" 0
-            "thumbnail" (sdict "url" "https://cdn3.emoji.gg/emojis/1463-wave.gif")
-            "fields" (cslice 
-                (sdict "name" "Volitelné role <a:_:1098011075280117840>" "value" "> Chceš upozornit, když bude tvá oblíbená hra zrovna ve slevě?\n> ... nebo si chceš zahrát textové RPG?\n> Potom si nezapomeň prohlédnout <#908005311573532672>." "inline" false) 
-                (sdict "name" "Moduly <a:_:1097917564232945735>" "value" "> Moduly nám pomáhají vytvořit přehledné prostředí bez spamu a dávají členům možnost zobrazovat jen taková témata, která je doopravdy zajímají.\n> Podívej se do <#935592355749298216>, a pokud se chceš do takových modulů přidat, neváhej!" "inline" false) 
-                (sdict "name" "Mushroom.gg <a:_:1097917539729805543>" "value" "> Ještě jsi o [Mushroom.gg](https://mushroom.gg/faq) neslyšel?\n> Tak neztrácej čas! Použij <@656246645075345461> příkaz **`/help`** nebo **`/login`** a začni získávat odměny ze svých oblíbených her!\n> Případně více příkazů je zde: https://discord.com/channels/322783694731608074/381403492574822400/382867478763667456." "inline" false) 
-                (sdict "name" "Emoji & Soundboard <a:_:1097490282834043002>" "value" "> Server nabízí rozmanité nevídané emoji a soundboard.\n> Také se můžeš připojit https://discord.com/channels/322783694731608074/910523820371214458/1108215102257254452 na další soundboard rozšiřující servery!" "inline" false) 
-            )
-        }}
+		{{ $welcomeEmbed := cembed
+			"title" "**Ahoj! ... a vítej!**"
+			"description" (joinStr "" $user.Mention ", s plným oprávněním jsou ti dveře nyní všude otevřené!\nDoufáme, že u nás v komunitě nalezneš mnoho zajímavého a také nové přátele.")
+			"color" 0
+			"thumbnail" (sdict "url" "https://cdn3.emoji.gg/emojis/1463-wave.gif")
+			"fields" (cslice 
+				(sdict "name" "Volitelné role <a:_:1098011075280117840>" "value" "> Chceš upozornit, když bude tvá oblíbená hra zrovna ve slevě?\n> ... nebo si chceš zahrát textové RPG?\n> Potom si nezapomeň prohlédnout <#908005311573532672>." "inline" false) 
+				(sdict "name" "Moduly <a:_:1097917564232945735>" "value" "> Moduly nám pomáhají vytvořit přehledné prostředí bez spamu a dávají členům možnost zobrazovat jen taková témata, která je doopravdy zajímají.\n> Podívej se do <#935592355749298216>, a pokud se chceš do takových modulů přidat, neváhej!" "inline" false) 
+				(sdict "name" "Mushroom.gg <a:_:1097917539729805543>" "value" "> Ještě jsi o [Mushroom.gg](https://mushroom.gg/faq) neslyšel?\n> Tak neztrácej čas! Použij <@656246645075345461> příkaz **`/help`** nebo **`/login`** a začni získávat odměny ze svých oblíbených her!\n> Případně více příkazů je zde: https://discord.com/channels/322783694731608074/381403492574822400/382867478763667456." "inline" false) 
+				(sdict "name" "Emoji & Soundboard <a:_:1097490282834043002>" "value" "> Server nabízí rozmanité nevídané emoji a soundboard.\n> Také se můžeš připojit https://discord.com/channels/322783694731608074/910523820371214458/1108215102257254452 na další soundboard rozšiřující servery!" "inline" false) 
+			)
+		}}
 
-        {{ $welcome_msg := complexMessage "content" $user.Mention "embed" $welcomeEmbed }}
-        {{ $welcome_msg_id := sendMessageRetID $channel_welcome $welcome_msg }}
-        {{ deleteMessage $channel_welcome $welcome_msg_id 43200 }}
+		{{ $welcome_msg := complexMessage "content" $user.Mention "embed" $welcomeEmbed }}
+		{{ $welcome_msg_id := sendMessageRetID $channel_welcome $welcome_msg }}
+		{{ deleteMessage $channel_welcome $welcome_msg_id 43200 }}
         
-    {{ else if eq .Reaction.Emoji.Name $reaction_emoji_name_2 }}
-        {{ $embed := cembed  
-            "description" (joinStr "" .User.Mention " **rejected** full access to " $user.Mention "!" )
-            "color" 16777215
-            "author" (sdict "name" $user.String "icon_url" $avatar) 
-            "timestamp" .ReactionMessage.Timestamp
-        }}
+	{{ else if eq .Reaction.Emoji.Name $reaction_emoji_name_2 }}
+		{{ $embed := cembed
+			"title" "**Member Access**"
+			"description" (joinStr "" .User.Mention " **rejected** full access to " $user.Mention "!" )
+			"color" 16777215
+			"author" (sdict "name" $user.String "icon_url" $avatar) 
+			"timestamp" .ReactionMessage.Timestamp
+		}}
 
-        {{ sendMessage $channel_log $embed }}
+		{{ sendMessage $channel_log $embed }}
 
-        {{ deleteAllMessageReactions nil .Message.ID }}
-        {{ addReactions $reaction_emoji_name_4 }}
-    {{ end }}
+		{{ deleteAllMessageReactions nil .Message.ID }}
+		{{ addReactions $reaction_emoji_name_4 }}
+	{{ end }}
 {{ end }}

@@ -15,7 +15,8 @@
 		{{ $ex := or (and (reFind "a_" .Guild.Icon) "gif" ) "png" }}
 		{{ $giconUrl := print "https://cdn.discordapp.com/icons/" .Guild.ID "/" .Guild.Icon "." $ex "?size=1024" }}
 
-		{{ $logEmbed := cembed  
+		{{ $logEmbed := cembed
+			"title" "**Inactivity**"
 			"description" (joinStr " " $member.User.Mention "**is becoming inactive!**")
 			"color" 16252672
 			"author" (sdict "name" $member.User.String "icon_url" $avatarUrl) 
@@ -26,10 +27,10 @@
 			"description" "It's been a while since we've seen you ..."
 			"color" 0
 			"thumbnail" (sdict "url" $giconUrl)
-			"image" (sdict "url" "https://media.discordapp.net/attachments/639725322778181632/1111611468387991572/inactive.gif")
+			"image" (sdict "url" "https://cdn.discordapp.com/attachments/639725322778181632/1115335401251536976/activity_outro.gif")
 			"fields" (cslice 
 				(sdict "name" " " "value" "You are still a member, but you received a special role of inactivity in order to let us keep the community management healthy." "inline" false)
-				(sdict "name" " " "value" "*You cannot read message history in the community, but you can simply get rid of the role by starting to communicate with us using chat, reactions, or voice!*" "inline" false)
+				(sdict "name" " " "value" "*You cannot read message history in the community now, but you can still chat with us and talk with us. You can simply get rid of the role by starting to communicate with us using chat, reactions, or voice. Come back and [**join the server**](https://discord.gg/CnakABG)!*" "inline" false)
 			)
 		}}
 
