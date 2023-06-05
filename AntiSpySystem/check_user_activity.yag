@@ -52,7 +52,6 @@
 			"fields" (cslice 
 				(sdict "name" " " "value" "*You might need to restart the Discord app in order to read text channels history.*" "inline" false)
 			)
-			"timestamp" $activityTime
 		}}
 
 		{{ sendDM $dmEmbed }}
