@@ -27,6 +27,6 @@
 	{{ deleteMessage nil .ReactionMessage.ID 0 }}
 	{{ sleep 1 }}
 	{{ addMessageReactions $channel_log $msg_id "✅" "❎" }}
-	{{ $msg_response := (sendMessageRetID nil "**Tvá zpráva byla úspěšně odeslána!** :slight_smile:\nNyní se již pracuje na vyřízení tvého udělení plného přístupu do komunity. Případně se ozvi pomocí soukromé zprávy.") }}
+	{{ $msg_response := (sendMessageRetID nil (joinStr "" "**" .User.Mention ", tvá zpráva byla úspěšně odeslána!** :slight_smile:\nNyní se již pracuje na vyřízení tvého udělení plného přístupu do komunity. Případně se ozvi pomocí soukromé zprávy.")) }}
 	{{ deleteMessage nil $msg_response 30 }}
 {{ end }}
