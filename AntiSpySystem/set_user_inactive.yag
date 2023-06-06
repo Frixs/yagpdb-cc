@@ -29,8 +29,8 @@
 			"thumbnail" (sdict "url" $giconUrl)
 			"image" (sdict "url" "https://cdn.discordapp.com/attachments/639725322778181632/1115335401251536976/activity_outro.gif")
 			"fields" (cslice 
-				(sdict "name" " " "value" "You are still a member, but you received a special role of inactivity in order to let us keep the community management healthy." "inline" false)
-				(sdict "name" " " "value" "*You cannot read message history in the community now, but you can still chat with us and talk with us. You can simply get rid of the role by starting to communicate with us using chat, reactions, or voice. Come back and [**join the server**](https://discord.gg/CnakABG)!*" "inline" false)
+				(sdict "name" " " "value" "You are still a member, but you received a special role of inactivity to let us keep the community going healthy." "inline" false)
+				(sdict "name" " " "value" "*You can still chat with us and talk with us, but you cannot read message history in the community now. You can simply get rid of the role by starting to communicate with us using chat, reactions, or voice. We invite you to [**visit the server**](https://discord.gg/CnakABG) again!*" "inline" false)
 			)
 		}}
 
