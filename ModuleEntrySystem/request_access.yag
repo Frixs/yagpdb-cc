@@ -46,7 +46,7 @@
 
 				{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString .User.ID) "/" .User.Avatar ".png") }}
 				{{ $embed := cembed  
-					"title" "Module access request"
+					"title" "Module Access Request"
 					"fields" (cslice 
 							(sdict "name" "Module" "value" (getRole $rid).Mention "inline" false) 
 							(sdict "name" "Member" "value" .User.Mention "inline" false) 
@@ -75,7 +75,7 @@
 
 				{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString .User.ID) "/" .User.Avatar ".png") }}
 				{{ $embed := cembed  
-					"title" "**Module Access**"
+					"title" "Module Access"
 					"description" (joinStr "" .User.Mention " **left** module " (getRole $rid).Mention "." )
 					"color" $color_module
 					"footer" (sdict 

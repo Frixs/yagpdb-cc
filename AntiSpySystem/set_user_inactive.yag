@@ -16,7 +16,7 @@
 		{{ $giconUrl := print "https://cdn.discordapp.com/icons/" .Guild.ID "/" .Guild.Icon "." $ex "?size=1024" }}
 
 		{{ $logEmbed := cembed
-			"title" "**Inactivity**"
+			"title" "Inactivity"
 			"description" (joinStr " " $member.User.Mention "**is becoming inactive!**")
 			"color" 16252672
 			"author" (sdict "name" $member.User.String "icon_url" $avatarUrl) 

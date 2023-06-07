@@ -29,7 +29,7 @@
 		{{ if (targetHasRoleID $user ($args.Get 1).ID) }}
 			{{ if $args.IsSet 2 }} 
 				{{ $embed = cembed
-					"title" "**Module Access**"
+					"title" "Module Access"
 					"description" (joinStr "" .User.Mention " **fired**  " $user.Mention " from module " ($args.Get 1).Mention "!")
 					"color" 5763719 
 					"fields" (cslice 
@@ -39,7 +39,7 @@
 				}}
 			{{ else }}
 				{{ $embed = cembed
-					"title" "**Module Access**"
+					"title" "Module Access"
 					"description" (joinStr "" .User.Mention " **fired**  " $user.Mention " from module " ($args.Get 1).Mention "!")
 					"color" 5763719 
 					"author" (sdict "name" (joinStr "" $user.String " (" (getMember $user.ID).Nick ")") "icon_url" $avatar) 

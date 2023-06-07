@@ -12,7 +12,7 @@
 
 {{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString .User.ID) "/" .User.Avatar ".png") }}
 {{ $embed := cembed
-	"title" "**Newcomer Request**"
+	"title" "Newcomer Request"
 	"description" .User.Mention
 	"color" 16620858
 		"fields" (cslice 

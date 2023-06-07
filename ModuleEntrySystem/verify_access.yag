@@ -31,7 +31,7 @@
 
 					{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $uid) "/" (userArg $uid).Avatar ".png") }}
 					{{ $embed := cembed  
-						"title" "**Module Access**"
+						"title" "Module Access"
 						"description" (joinStr "" .User.Mention " **granted** access to " (userArg $uid).Mention " to module " (getRole $rid).Mention "." )
 						"color" $color_module
 						"author" (sdict "name" (userArg $uid).String "icon_url" $avatar) 
@@ -46,7 +46,7 @@
 				{{ if not (targetHasRoleID $uid $rid) }}
 					{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $uid) "/" (userArg $uid).Avatar ".png") }}
 					{{ $embed := cembed
-						"title" "**Module Access**"
+						"title" "Module Access"
 						"description" (joinStr "" .User.Mention " **rejected** access to " (userArg $uid).Mention " to module " (getRole $rid).Mention "." )
 						"color" $color_module
 						"author" (sdict "name" (userArg $uid).String "icon_url" $avatar) 
