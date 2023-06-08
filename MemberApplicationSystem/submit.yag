@@ -9,7 +9,7 @@
 	Only run in the following channels: new-access
 */}}
 
-{{ $msg_response := (sendMessageRetID nil (joinStr "" "**" .User.Mention ", hezká zpráva!**\n**Ale ještě ji potřebuješ odeslat. Označ svoji zprávu pomocí reakce a máš hotovo! (viz. info. výše)** :slight_smile:")) }}
+{{ $msg_response := (sendMessageRetID nil (joinStr "" "**" .User.Mention ", hezká zpráva!**\n**Ale ještě ji potřebuješ odeslat. Označ svoji zprávu pomocí reakce a máš hotovo! (viz info. výše)** :slight_smile:")) }}
 {{ addMessageReactions nil .Message.ID "📤" }}
 {{ deleteMessage nil $msg_response 30 }}
 {{ deleteMessage nil .Message.ID 3600 }}
