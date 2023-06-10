@@ -12,4 +12,4 @@
 {{ $ccScheduleKey := (joinStr "-" $dbEntryID $user.ID) }}
 
 {{ cancelScheduledUniqueCC $setUserInactiveCCID $ccScheduleKey }}
-{{ dbSetExpire $user.ID $dbEntryID 0 0 }}
+{{ dbSetExpire $user.ID $dbEntryID 0 1 }}
