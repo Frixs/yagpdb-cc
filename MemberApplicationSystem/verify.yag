@@ -44,9 +44,9 @@
 			"thumbnail" (sdict "url" "https://cdn3.emoji.gg/emojis/1463-wave.gif")
 			"fields" (cslice 
 				(sdict "name" "Volitelné role <a:_:1098011075280117840>" "value" "> Chceš upozornit, když bude tvá oblíbená hra zrovna ve slevě?\n> ... nebo si chceš zahrát textové RPG?\n> Potom si nezapomeň prohlédnout <#908005311573532672>." "inline" false) 
-				(sdict "name" "Moduly <a:_:1097917564232945735>" "value" "> Moduly nám pomáhají vytvořit přehledné prostředí bez spamu a dávají členům možnost zobrazovat jen taková témata, která je doopravdy zajímají.\n> Podívej se do <#935592355749298216>, a pokud se chceš do takových modulů přidat, neváhej!" "inline" false) 
+				(sdict "name" "Moduly <a:_:1097917564232945735>" "value" "> Moduly nám pomáhají vytvořit přehledné prostředí členěním komunikace do zvláštních sekcí podle daných zájmů.\n> Podívej se do <#935592355749298216>, a pokud se chceš do takových modulů přidat, neváhej!" "inline" false) 
 				(sdict "name" "Mushroom.gg <a:_:1097917539729805543>" "value" "> Ještě jsi o [Mushroom.gg](https://mushroom.gg/faq) neslyšel?\n> Tak neztrácej čas! Použij <@656246645075345461> příkaz **`/help`** nebo **`/login`** a začni získávat odměny ze svých oblíbených her!\n> Případně více příkazů je zde: https://discord.com/channels/322783694731608074/381403492574822400/382867478763667456." "inline" false) 
-				(sdict "name" "Emoji & Soundboard <a:_:1097490282834043002>" "value" "> Server nabízí rozmanité nevídané emoji a soundboard.\n> Také se můžeš připojit na rozšiřující servery pro soundboard, stickers a další: https://discord.com/channels/322783694731608074/910523820371214458/1116753470398148628." "inline" false) 
+				(sdict "name" "Emoji & Soundboard <a:_:1097490282834043002>" "value" "> Server nabízí velmi rozmanité emoji a soundboard.\n> Také se můžeš připojit na rozšiřující servery pro soundboard, stickers a další: https://discord.com/channels/322783694731608074/910523820371214458/1116753470398148628." "inline" false) 
 			)
 		}}
 
