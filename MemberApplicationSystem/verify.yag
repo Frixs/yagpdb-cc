@@ -52,7 +52,7 @@
 
 		{{ $welcome_msg := complexMessage "content" $user.Mention "embed" $welcomeEmbed }}
 		{{ $welcome_msg_id := sendMessageRetID $channel_welcome $welcome_msg }}
-		{{ deleteMessage $channel_welcome $welcome_msg_id 43200 }}
+		{{ deleteMessage $channel_welcome $welcome_msg_id 64800 }}
         
 	{{ else if eq .Reaction.Emoji.Name $reaction_emoji_name_2 }}
 		{{ $embed := cembed
