@@ -4,7 +4,7 @@
 	Made by Frixs#8694
 
 	---
-	Channel/User role restrictions (require): Administrator, Moderator, Officer
+	Channel/User role restrictions (require): Administrator, Alpha (Moderator), Mane (Officer)
 	Only run in the following channels: newcomers
 */}}
 

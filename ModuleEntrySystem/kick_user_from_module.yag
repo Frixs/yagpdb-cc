@@ -5,7 +5,7 @@
 	Made by Frixs#8694
 
 	---
-	Channel/User role restrictions (require): Administrator, Moderator, Ambasador
+	Channel/User role restrictions (require): Administrator, Alpha (Moderator), Apex (Ambassador)
 */}}
 
 {{$args := parseArgs 2 "<@user> <@role>"
@@ -22,7 +22,7 @@
 {{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $user.ID) "/" $user.Avatar ".png") }}
 {{ $embed := cembed }}
 
-{{/* required (to use) ambassador role is set in command settings, not in code */}}
+{{/* required (to use) Apex role is set in command settings, not in code */}}
 {{/* only high-placed users or users from the current module can access through */}}
 {{ if or (targetHasRoleID .User.ID ($args.Get 1).ID) (targetHasRoleID .User.ID $admin_role) (targetHasRoleID .User.ID $moderator_role) }}
 	{{ if (hasPrefix ($args.Get 1).Name "/") }}

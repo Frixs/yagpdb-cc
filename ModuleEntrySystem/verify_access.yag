@@ -4,7 +4,7 @@
 	Made by Frixs#8694
 
 	---
-	Channel/User role restrictions (require): Administrator, Moderator, Ambasador
+	Channel/User role restrictions (require): Administrator, Alpha (Moderator), Apex (Ambassador)
 	Only run in the following channels: module-entry
 */}}
 
@@ -22,7 +22,7 @@
 		{{ $rid := (getRole (index (index .Message.Embeds 0).Fields 0).Value).ID }}
 		{{ $uid := (userArg (index (index .Message.Embeds 0).Fields 1).Value).ID }}
 
-		{{/* required (to use) ambassador role is set in command settings, not in code */}}
+		{{/* required (to use) Apex role is set in command settings, not in code */}}
 		{{/* only high-placed users or users from the current module can access through */}}
 		{{ if or (targetHasRoleID .User.ID $rid) (targetHasRoleID .User.ID $admin_role) (targetHasRoleID .User.ID $moderator_role) }}
 			{{ if eq .Reaction.Emoji.Name $reaction_emoji_name_3 }}
