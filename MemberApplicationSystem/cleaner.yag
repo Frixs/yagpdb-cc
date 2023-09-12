@@ -1,0 +1,15 @@
+{{/*
+	Trigger Type: Hourly interval
+	Interval: 6
+	Channel: None
+
+	Made by Frixs#8694
+*/}}
+
+{{/* Use -nopin to ignore pinned messages instead of -ma which ignores messages older than specified time period. */}}
+{{ execAdmin "clean" "-ma 7d" "-minage 24h" 100 }}
+
+{{/* It runs every 6 hour so it should be capable of removing all unwanted messages */}}
+{{/* during normal traffic of the last given 7 days. */}}
+{{/* It should ignore new messages so it cannot run into situation when it deletes messages right after its creation, for instance. */}}
+{{/* Users need some time to write their message and other (admins) needs some time to react on it. */}}

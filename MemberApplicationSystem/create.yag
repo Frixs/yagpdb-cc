@@ -1,5 +1,6 @@
 {{/*
-	Trigger Type: Reaction (Add only)
+	Trigger: --- no/empty value --- (trigger any message)
+	Trigger Type: Contains
 
 	Made by Frixs#8694
 
@@ -8,25 +9,9 @@
 	Only run in the following channels: new-access
 */}}
 
-{{ $channel_log := 907636826947321867 }} {{/* log channel */}}
-
-{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString .User.ID) "/" .User.Avatar ".png") }}
-{{ $embed := cembed
-	"title" "Newcomer Request"
-	"description" .User.Mention
-	"color" 16620858
-		"fields" (cslice 
-			(sdict "name" "Message" "value" .ReactionMessage.Content "inline" false) 
-		) 
-	"author" (sdict "name" .User.String "icon_url" $avatar) 
-	"timestamp" .ReactionMessage.Timestamp
-}}
-
-{{ if eq .ReactionMessage.Author.ID .User.ID }} 
-	{{ $msg_id := (sendMessageRetID $channel_log $embed) }}
-	{{ deleteMessage nil .ReactionMessage.ID 0 }}
-	{{ sleep 1 }}
-	{{ addMessageReactions $channel_log $msg_id "✅" "❎" }}
-	{{ $msg_response := (sendMessageRetID nil (joinStr "" "**" .User.Mention ", tvá zpráva byla úspěšně odeslána!** :slight_smile:\nNyní se již pracuje na vyřízení tvého udělení plného přístupu do komunity. Případně se ozvi pomocí soukromé zprávy.")) }}
-	{{ deleteMessage nil $msg_response 30 }}
+{{ if gt (len .Message.Content) 0 }}
+	{{/* $msg_response := (sendMessageRetID nil (joinStr "" "**" .User.Mention ", hezká zpráva!**\n**Ale ještě ji potřebuješ odeslat. Označ svoji zprávu pomocí reakce a máš hotovo! (viz info. výše)** :slight_smile:")) */}}
+	{{/* deleteMessage nil $msg_response 30 */}}
+	{{ addMessageReactions nil .Message.ID "📤" }}
+	{{ deleteMessage nil .Message.ID 3600 }}
 {{ end }}
