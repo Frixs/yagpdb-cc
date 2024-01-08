@@ -8,19 +8,21 @@
 */}}
 
 {{ $d_entry_delay_unix := 1800 }} {{/* cooldown on requesting new application to given module */}}
-{{ $color_module := 5763719 }}
+{{ $color_module := 5554972 }}
 {{ $color_application := 16333359 }}
 {{ $channel := 935592355749298216 }}
 {{ $channel_log := 381193211558887424 }}
 {{ $reaction_emoji_name_1 := "join:1194035851504648192" }}
+{{ $reaction_emoji_name_1_name := "join" }}
 {{ $reaction_emoji_name_2 := "leave:1194035576224096297" }}
+{{ $reaction_emoji_name_2_name := "leave" }}
 {{ $reaction_emoji_name_3 := "✅" }}
 {{ $reaction_emoji_name_4 := "❎" }}
 
 {{ if gt (len .Message.Embeds) 0 }}
 	{{ deleteMessageReaction nil .Message.ID .User.ID $reaction_emoji_name_1 $reaction_emoji_name_2 }}
 	
-	{{ if eq .Reaction.Emoji.Name $reaction_emoji_name_1 }}
+	{{ if eq .Reaction.Emoji.Name $reaction_emoji_name_1_name }}
 		{{ if eq (index .Message.Embeds 0).Color $color_module }}
 			{{ $creatable := true }}
 			{{ $rid := (getRole (index (index .Message.Embeds 0).Fields 1).Value).ID }}
@@ -66,7 +68,7 @@
 			{{ end }}
 		{{ end }}
 
-	{{ else if eq .Reaction.Emoji.Name $reaction_emoji_name_2 }}
+	{{ else if eq .Reaction.Emoji.Name $reaction_emoji_name_2_name }}
 		{{ if eq (index .Message.Embeds 0).Color $color_module }}
 			{{ $rid := (getRole (index (index .Message.Embeds 0).Fields 1).Value).ID }}
 			
