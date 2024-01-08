@@ -9,22 +9,28 @@
     Only run in the following channels: module-entry
 */}}
 
-{{$args := parseArgs 2 "<title> <role>"
+{{$args := parseArgs 2 "<title> <role> [<channel>]"
     (carg "string" "Title of the module")
     (carg "role" "Role of the module")
+    (carg "channel" "Highlighted channel of the module")
 }}
 
+{{ $reaction_emoji_name_1 := "join:1194035851504648192" }}
+{{ $reaction_emoji_name_2 := "leave:1194035576224096297" }}
 {{ $presentation_channel := 935592355749298216 }}
 
 {{ if eq "/" (reFind "/" ($args.Get 1).Name) }}
     {{$embed := cembed  
         "title" ($args.Get 0)
-        "description" ($args.Get 1).Mention
-        "color" 5763719
+        "color" 5554972
+        "fields" (cslice 
+            (sdict "name" " " "value" ($args.Get 2).Mention "inline" true)
+            (sdict "name" " " "value" ($args.Get 1).Mention "inline" true)
+        )
     }}
     {{ $msg_id := (sendMessageRetID $presentation_channel $embed) }}
     {{ sleep 1 }}
-    {{ addMessageReactions $presentation_channel $msg_id "✋" "❌" }}
+    {{ addMessageReactions $presentation_channel $msg_id $reaction_emoji_name_1 $reaction_emoji_name_2 }}
 {{ else }}
     {{ "Invalid role!" }}
 {{ end }}

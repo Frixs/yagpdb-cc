@@ -12,8 +12,8 @@
 {{ $color_application := 16333359 }}
 {{ $channel := 935592355749298216 }}
 {{ $channel_log := 381193211558887424 }}
-{{ $reaction_emoji_name_1 := "✋" }}
-{{ $reaction_emoji_name_2 := "❌" }}
+{{ $reaction_emoji_name_1 := "join:1194035851504648192" }}
+{{ $reaction_emoji_name_2 := "leave:1194035576224096297" }}
 {{ $reaction_emoji_name_3 := "✅" }}
 {{ $reaction_emoji_name_4 := "❎" }}
 
@@ -23,7 +23,7 @@
 	{{ if eq .Reaction.Emoji.Name $reaction_emoji_name_1 }}
 		{{ if eq (index .Message.Embeds 0).Color $color_module }}
 			{{ $creatable := true }}
-			{{ $rid := (getRole (index .Message.Embeds 0).Description).ID }}
+			{{ $rid := (getRole (index (index .Message.Embeds 0).Fields 1).Value).ID }}
 
 			{{ $data_flags := dbGet .User.ID "data_module_entry_flags" }}
 			{{ $data_value := sdict }}
@@ -68,7 +68,7 @@
 
 	{{ else if eq .Reaction.Emoji.Name $reaction_emoji_name_2 }}
 		{{ if eq (index .Message.Embeds 0).Color $color_module }}
-			{{ $rid := (getRole (index .Message.Embeds 0).Description).ID }}
+			{{ $rid := (getRole (index (index .Message.Embeds 0).Fields 1).Value).ID }}
 			
 			{{ if (targetHasRoleID .User.ID $rid) }}
 				{{ takeRoleID .User.ID $rid }}
