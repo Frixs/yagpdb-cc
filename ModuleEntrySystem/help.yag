@@ -1,0 +1,22 @@
+{{/*
+	Trigger: ^(!){0,1}([Hh]elp){1}
+	Trigger Type: Regex
+
+	Made by Frixs#8694
+
+	---
+	Channel/User role restrictions (require): Administrator, Alpha (Moderator), Apex (Ambassador)
+*/}}
+
+{{ $channelID := 935592355749298216 }}
+
+{{ $embed := cembed
+    "title" "❓ MODULE CONTROL"
+    "description" (joinStr "\n" "`!mjoin` - Join user to the module." "`!mkick` - Kick user from the module.")
+    "color" 5763719
+    "fields" (cslice 
+        (sdict "name" "Member Requests" "value" (joinStr "" "Members can enter the module chats on demand. However, do not forget you have to approve them in " (getChannel $channelID).Mention ".") "inline" false) 
+    )
+}}
+
+{{ sendMessage nil $embed }}

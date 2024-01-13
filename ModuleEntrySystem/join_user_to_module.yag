@@ -1,0 +1,55 @@
+{{/*
+	Trigger: mjoin
+	Trigger Type: Command
+
+	Made by Frixs#8694
+
+	---
+	Channel/User role restrictions (require): Administrator, Alpha (Moderator), Apex (Ambassador)
+*/}}
+
+{{$args := parseArgs 2 "1. `<user:mention>` = Mention přidávaného uživatele.\n2. `<role:mention>` = Mention role modulu, do kterého uživatele přidat."
+	(carg "user" "mention přidávaného uživatele")
+	(carg "role" "mention role modulu, do kterého uživatele přidat")
+}}
+
+{{ $admin_role := 868210385994522634 }}
+{{ $moderator_role := 322786608766124032 }}
+{{ $channelID := 381193211558887424 }}
+
+{{ $user := $args.Get 0 }}
+{{ $role := $args.Get 1 }}
+{{ $avatar := (joinStr "" "https://cdn.discordapp.com/avatars/" (toString $user.ID) "/" $user.Avatar ".png") }}
+{{ $embed := cembed }}
+
+{{/* required (to use) Apex role is set in command settings, not in code */}}
+{{/* only high-placed users or users from the current module can access through */}}
+{{ if or (targetHasRoleID .User.ID $role.ID) (targetHasRoleID .User.ID $admin_role) (targetHasRoleID .User.ID $moderator_role) }}
+	{{ if (hasPrefix $role.Name "/") }}
+		{{ if not (targetHasRoleID $user $role.ID) }}
+            {{ $embed = cembed
+                "title" "Module Access"
+                "description" (joinStr "" .User.Mention " **joined**  " $user.Mention " to module " $role.Mention "!")
+                "color" 5763719 
+                "author" (sdict "name" (joinStr "" $user.String " (" (getMember $user.ID).Nick ")") "icon_url" $avatar) 
+                "timestamp" .ReactionMessage.Timestamp
+            }}
+
+            {{ if eq $user.ID .User.ID }}
+            **You cannot join yourself!**
+            {{ else if $user.Bot }}
+            **You cannot join bot!**
+            {{ else }}
+                {{ giveRoleID $user.ID $role.ID }}
+                {{ sendMessage $channelID $embed }}
+                {{ joinStr "" $user.Mention "** successfully joined!**" }}
+            {{ end }}
+		{{ else }}
+        **The user is already member of that module!**
+        {{ end }}
+	{{ end }}
+{{ else }}
+**You do not have permissions to do that!**
+{{ end }}
+{{ deleteResponse 20 }}
+{{ deleteTrigger 20 }}
