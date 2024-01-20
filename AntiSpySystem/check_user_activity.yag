@@ -22,7 +22,7 @@
 	{{ if or (targetHasRoleID $user.ID $inactiveRID) (not (dbCount (sdict "userID" $user.ID "pattern" $dbEntryID))) }}
 		{{ $activityReferenceText := "" }}
 		{{ $descText := "" }}
-	{{ if $activityDescription }} {{ $descText = (joinStr "" "**/**" $activityDescription) }} {{ end }}
+		{{ if $activityDescription }} {{ $descText = (joinStr "" "**/**" $activityDescription) }} {{ end }}
 		{{ if eq $activityType "voice" }}
 			{{ $activityReferenceText = (joinStr "" "<#" $activityCID ">" $descText " *(" $activityType ")*") }}
 		{{ else }}

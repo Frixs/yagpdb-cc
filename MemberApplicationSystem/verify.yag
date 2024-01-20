@@ -39,7 +39,7 @@
 
 		{{ $welcomeEmbed := cembed
 			"title" "**Ahoj! ... a vítej!**"
-			"description" (joinStr "" $user.Mention ", s plným oprávněním jsou ti nyní dveře všude otevřené! Doufáme, že zde nalezneš mnoho zajímavého a také nové přátele.\n\nPřijď s námi pokecat! Nezapomeň ale na slušné vychování. Jsme dospělé osazenstvo a tudíž se i na takové úrovni rádi bavíme. Proto je také doporučený věk **18** let a více.\n\nZajímavé možnosti serveru jsou pro tebe vypsány níže.\nPokud ti však unikly základní informace o nás, nalezneš je v místnostech <#381191553340801024> a <#381481651001360394>.\n⠀")
+			"description" (joinStr "" $user.Mention ", s plným oprávněním jsou ti nyní dveře všude otevřené! Doufáme, že zde nalezneš mnoho zajímavého a také nové přátele.\n\nPřijď s námi pokecat! Nezapomeň ale na slušné vychování. Jsme dospělé osazenstvo a tudíž se i na takové úrovni rádi bavíme. Proto je také doporučený věk **20** let a více.\n\nZajímavé možnosti serveru jsou pro tebe vypsány níže.\nPokud ti však unikly základní informace o nás, nalezneš je v místnostech <#381191553340801024> a <#381481651001360394>.\n⠀")
 			"color" 0
 			"thumbnail" (sdict "url" "https://cdn3.emoji.gg/emojis/1463-wave.gif")
 			"fields" (cslice 
