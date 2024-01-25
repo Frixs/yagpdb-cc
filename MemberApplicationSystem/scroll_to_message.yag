@@ -1,0 +1,19 @@
+{{/*
+	Trigger .*
+	Trigger Type: Regex
+  
+	Made by Frixs#8694
+*/}}
+ 
+{{$message := cembed 
+	"title" "" 
+    "description" "**⠀⠀⠀⠀⠀⠀ [ＶＥＲＩＦＹ](https://discord.com/channels/322783694731608074/381192427291148298/1194332343796777081) ⠀⠀⠀⠀⠀⠀**"
+    "color" 43260
+}}
+ 
+{{/* do not edit below */}}
+{{if $db := dbGet .Channel.ID "stickymessage_verify"}}
+	{{deleteMessage nil (toInt $db.Value) 0}}
+{{end}}
+{{$id := sendMessageRetID nil $message}}
+{{dbSet .Channel.ID "stickymessage_verify" (str $id)}}
