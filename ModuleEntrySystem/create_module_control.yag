@@ -19,7 +19,7 @@
 {{ $reaction_emoji_name_2 := "leave:1194035576224096297" }}
 {{ $presentation_channel := 935592355749298216 }}
 
-{{ if eq "/" (reFind "/" ($args.Get 1).Name) }}
+{{ if or (eq "/" (reFind "/" ($args.Get 1).Name)) (eq "\\" (reFind "\\" ($args.Get 1).Name)) }}
     {{$embed := cembed  
         "title" ($args.Get 0)
         "color" 5554972

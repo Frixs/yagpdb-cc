@@ -26,7 +26,7 @@
 {{/* required (to use) Apex role is set in command settings, not in code */}}
 {{/* only high-placed users or users from the current module can access through */}}
 {{ if or (targetHasRoleID .User.ID $role.ID) (targetHasRoleID .User.ID $admin_role) (targetHasRoleID .User.ID $moderator_role) }}
-	{{ if (hasPrefix $role.Name "/") }}
+	{{ if or (hasPrefix $role.Name "/") (hasPrefix $role.Name "\\") }}
 		{{ if (targetHasRoleID $user $role.ID) }}
 			{{ if $args.IsSet 2 }} 
 				{{ $embed = cembed
