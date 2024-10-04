@@ -9,7 +9,7 @@
     Only run in the following channels: module-entry
 */}}
 
-{{$args := parseArgs 2 "<title> <role> [<channel>]"
+{{$args := parseArgs 2 "<title> <role> <channel>"
     (carg "string" "Title of the module")
     (carg "role" "Role of the module")
     (carg "channel" "Highlighted channel of the module")
@@ -19,7 +19,7 @@
 {{ $reaction_emoji_name_2 := "leave:1194035576224096297" }}
 {{ $presentation_channel := 935592355749298216 }}
 
-{{ if or (eq "/" (reFind "/" ($args.Get 1).Name)) (eq "\\" (reFind "\\" ($args.Get 1).Name)) }}
+{{ if or (eq "/" (reFind "/" ($args.Get 1).Name)) (eq "\\" (reFind "\\\\" ($args.Get 1).Name) ) }}
     {{$embed := cembed  
         "title" ($args.Get 0)
         "color" 5554972
