@@ -1,0 +1,106 @@
+{{/*
+	Trigger Type: Message Component, Regex: ^(approve|reject)-\d+-\d+$
+
+	Made by @frixs
+
+	---
+	Channel/User role restrictions (require): Administrator, Alpha (Moderator), Apex (Ambassador)
+	Only run in the following channels: module-entry
+*/}}
+
+{{/* ============ CONFIGURATION ============ */}}
+{{ $logChannelID := 1442546776492998763 }} {{/* Channel for log messages */}}
+{{ $requestRoleID := 1444276092616708268 }} {{/* Role ID that allows sending requests */}}
+{{ $embedColor := 0x3694E7 }}
+
+{{/* ============ PARSE BUTTON CUSTOM ID ============ */}}
+{{ $customID := .CustomID }}
+{{ $parts := split $customID "-" }}
+
+{{ if lt (len $parts) 3 }}
+    {{ return }}
+{{ end }}
+
+{{ $action := index $parts 0 }} {{/* approve or reject */}}
+{{ $targetUserID := toInt64 (index $parts 1) }}
+{{ $primaryRoleID := toInt64 (index $parts 2) }}
+
+{{/* Get roles */}}
+{{ $primaryRole := getRole $primaryRoleID }}
+{{ if not $primaryRole }}
+    {{ sendResponse nil (complexMessage "content" "❌ Role nebyla nalezena." "reply" .Interaction.Message.ID "ephemeral" true) }}
+    {{ return }}
+{{ end }}
+
+{{/* Find unverified role */}}
+{{ $unverifiedRoleName := print $primaryRole.Name "unverified" }}
+{{ $unverifiedRole := getRoleName $unverifiedRoleName }}
+{{ if not $unverifiedRole }}
+    {{ sendResponse nil (complexMessage "content" "❌ Unverified role nebyla nalezena." "reply" .Interaction.Message.ID "ephemeral" true) }}
+    {{ return }}
+{{ end }}
+{{ $unverifiedRoleID := $unverifiedRole.ID }}
+
+{{/* ============ PERMISSION CHECK ============ */}}
+{{/* User clicking button must have the primary role */}}
+{{ if not (targetHasRoleID .User.ID $primaryRoleID) }}
+    {{ sendResponse nil (complexMessage "content" "❌ Nemáš oprávnění rozhodovat o tomto přístupu!" "reply" .Interaction.Message.ID "ephemeral" true) }}
+    {{ return }}
+{{ end }}
+
+{{/* ============ PROCESS ACTION ============ */}}
+{{ $targetMember := getMember $targetUserID }}
+{{ $avatar := $targetMember.User.AvatarURL "256" }}
+
+{{ if eq $action "approve" }}
+    {{/* ===== APPROVE ===== */}}
+    
+    {{/* Give primary role, remove unverified and request role */}}
+    {{ giveRoleID $targetUserID $primaryRoleID }}
+    {{ takeRoleID $targetUserID $unverifiedRoleID }}
+    {{ takeRoleID $targetUserID $requestRoleID }}
+    
+    {{/* Interaction response */}}
+    {{ sendResponse nil (complexMessage "content" "✅ Přístup byl úspěšně schválen." "reply" .Interaction.Message.ID "ephemeral" false) }}
+    
+    {{/* Log message */}}
+    {{ $logEmbed := cembed
+        "title" "Module Access"
+        "description" (print .User.Mention " **granted** access to " $targetMember.User.Mention " to module " $primaryRole.Mention ".")
+        "color" $embedColor
+        "author" (sdict "name" $targetMember.User.String "icon_url" $avatar)
+        "timestamp" currentTime
+    }}
+    {{ sendResponse $logChannelID (complexMessage "embed" $logEmbed) }}
+    
+    {{/* Delete original request message */}}
+    {{ deleteMessage nil .Message.ID 0 }}
+    
+{{ else if eq $action "reject" }}
+    {{/* ===== REJECT ===== */}}
+    
+    {{/* Remove both primary and unverified roles, and request role */}}
+    {{ takeRoleID $targetUserID $primaryRoleID }}
+    {{ takeRoleID $targetUserID $unverifiedRoleID }}
+    {{ takeRoleID $targetUserID $requestRoleID }}
+    
+    {{/* Interaction response */}}
+    {{ sendResponse nil (complexMessage "content" (print "❌ Přístup byl zamítnut pro " $targetMember.User.Mention ". Zkus kontaktovat zodpovědné osoby přímo, díky.") "reply" .Interaction.Message.ID "ephemeral" false) }}
+    
+    {{/* Log message */}}
+    {{ $logEmbed := cembed
+        "title" "Module Access"
+        "description" (print .User.Mention " **rejected** access to " $targetMember.User.Mention " to module " $primaryRole.Mention ".")
+        "color" $embedColor
+        "author" (sdict "name" $targetMember.User.String "icon_url" $avatar)
+        "timestamp" currentTime
+    }}
+    
+    {{ sendResponse $logChannelID (complexMessage "embed" $logEmbed) }}
+    
+    {{/* Delete original request message */}}
+    {{ deleteMessage nil .Message.ID 0 }}
+    
+{{ else }}
+    {{ sendResponse nil (complexMessage "content" "❌ Neplatná akce." "reply" .Interaction.Message.ID "ephemeral" true) }}
+{{ end }}

@@ -1,0 +1,225 @@
+{{/* ============ CONFIGURATION ============ */}}
+{{ $databaseChannelID := 1442546776492998762 }}
+{{ $databaseMessageID := 1444645737068626051 }}
+{{ $notificationChannelID := 1444408680924577916 }}
+{{ $debugChannelID := 1442546776492998762 }}
+{{ $responsibleRoleID := 322791194046234634 }}
+{{ $reactionEmoji := "👍" }} {{/* indicates database message was read */}}
+{{ $databaseHeader := "**[CUSTOMCOMMANDS_AND_YAGPDB_MODULE_ENTRY_DATABASE]**" }}
+{{ $databaseHeaderRegex := `(\*\*\[CUSTOMCOMMANDS_AND_YAGPDB_MODULE_ENTRY_DATABASE\]\*\*)` }}
+{{ $duplicateCheckTime := 1800 }} {{/* 30 minutes in seconds */}}
+{{ $roleRemovalTime := 300 }} {{/* 5 minutes in seconds */}}
+{{ $requestExpiryTime := 86400 }} {{/* 24 hours in seconds */}}
+{{ $embedColor := 0xFFFFFF }}
+{{ $timeoutColor := 0xFF9900 }}
+
+{{ $currentTime := currentTime.Unix }}
+{{ $newlyLoadedQueries := cslice }} {{/* New queries for requests of users loaded from the database message | sdict(UserID,Timestamp,UnverifiedRoles) */}}
+{{ $newActiveRequests := cslice }} {{/* New requests that are going to be saved for further run/processing | sdict(MessageID,Timestamp,UserID,PrimaryRoleID,UnverifiedRoleID) */}}
+
+{{/* ============ GET ALL UNVERIFIED ROLES IN GUILD ============ */}}
+{{ $unverifiedRoleIDs := cslice }}
+{{ range .Guild.Roles }}
+    {{ if reFind `^/[A-Za-z]+/unverified$` .Name }}
+        {{ $unverifiedRoleIDs = $unverifiedRoleIDs.Append .ID }}
+    {{ end }}
+{{ end }}
+
+{{/* ============ LOAD DATABASE MESSAGE ============ */}}
+{{ $dbMessage := getMessage $databaseChannelID $databaseMessageID }}
+{{ $messageContent := $dbMessage.Content }}
+
+{{/* ============ CHECK FOR EXISTING REACTION ============ */}}
+{{ $hasReaction := false }}
+{{ range $dbMessage.Reactions }}
+    {{ if eq .Emoji.Name $reactionEmoji }}
+        {{ $hasReaction = true }}
+    {{ end }}
+{{ end }}
+
+{{/* ============ PARSE NEWLY LOADED DATA FROM MESSAGE ============ */}}
+{{ if not $hasReaction }}
+    {{/* ============ LOAD NEW DATA FROM MESSAGE ============ */}}
+    
+    {{/* Check if message contains header */}}
+    {{ if not (reFind $databaseHeaderRegex $messageContent) }}
+        {{ return }}
+    {{ end }}
+    
+    {{/* Extract data after header */}}
+    {{ $headerLength := len $databaseHeader }}
+    {{ $rawData := slice $messageContent $headerLength }}
+    {{ $rawData = reReplace `^\s+` $rawData "" }} {{/* Trim leading whitespace */}}
+    
+    {{/* If no data, skip to processing existing entries */}}
+    {{ if ne $rawData "" }}
+        {{/* Parse the data to records (comma separated) */}}
+        {{ $rawDataRecords := split $rawData "," }}
+        
+        {{ $alreadyProcessedUsers := cslice }}
+        {{ range $rawDataRecords }}
+            {{ $userID := . }} {{/* Each record is User ID */}}
+            {{ if eq $userID "" }}
+                {{ continue }}
+            {{ end }}
+            {{ if in $alreadyProcessedUsers $userID }}
+                {{ continue }}
+            {{ end }}
+            
+            {{/* Get member */}}
+            {{ $member := getMember $userID }}
+            {{ if not $member }}
+                {{ continue }} {{/* Member not found - skip */}}
+            {{ end }}
+            {{ $alreadyProcessedUsers = $alreadyProcessedUsers.Append $userID }}
+            
+            {{/* Find all unverified roles the user has */}}
+            {{ $userUnverifiedRoles := cslice }}
+            {{ range $member.Roles }}
+                {{ $roleID := . }}
+                {{ if in $unverifiedRoleIDs $roleID }}
+                    {{ $userUnverifiedRoles = $userUnverifiedRoles.Append $roleID }}
+                {{ end }}
+            {{ end }}
+            
+            {{/* If user has unverified roles, add to processing queue */}}
+            {{ if gt (len $userUnverifiedRoles) 0 }}
+                {{/* ============ SAVE NEW QUERY ============ */}}
+                {{ $newlyLoadedQueries = $newlyLoadedQueries.Append (sdict 
+                    "UserID" $userID 
+                    "Timestamp" (toString $currentTime) 
+                    "UnverifiedRoles" $userUnverifiedRoles
+                ) }}
+            {{ end }}
+        {{ end }}
+    {{ end }}
+    
+    {{/* Add reaction to mark as processed */}}
+    {{ addMessageReactions $databaseChannelID $databaseMessageID $reactionEmoji }}
+{{ else }}
+    {{/* sendMessage $debugChannelID "DEBUG: Thumbs up reaction found - skipping data load" */}}
+{{ end }}
+
+{{/* ============ LOAD EXISTING DATABASE ENTRIES ============ */}}
+{{ $existingRequests := (dbGet 0 "module_entry_pending_requests").Value }} {{/* These requests were already processed in a previous internval. */}}
+{{ if not $existingRequests }}
+    {{ $existingRequests = cslice }}
+{{ end }}
+
+{{/* ============ CLEANUP EXPIRED ENTRIES/REQUESTS & REMOVE ROLES ============ */}}
+{{ range $existingRequests }}
+    {{ $request := . }}
+    {{ $requestTimestamp := toInt $request.Timestamp }}
+    {{ $age := sub $currentTime $requestTimestamp }}
+    
+    {{ if lt $age $requestExpiryTime }}
+        {{/* Request not expired yet - keep it */}}
+        
+        {{/* Check if roles should be removed (>5 minutes) - no need to keep them, once the request is accepted, the user will receive everything needed. */}}
+        {{ if gt $age $roleRemovalTime }}
+            {{ $userID := toInt64 $request.UserID }}
+            {{ $unverifiedRoleID := toInt64 $request.UnverifiedRoleID }}
+            {{ $primaryRoleID := toInt64 $request.PrimaryRoleID }}
+            
+            {{/* Remove roles if user still has them */}}
+            {{ if (targetHasRoleID $userID $unverifiedRoleID) }}
+                {{ takeRoleID $userID $primaryRoleID }}
+                {{ takeRoleID $userID $unverifiedRoleID }}
+            {{ end }}
+        {{ end }}
+        
+        {{ $newActiveRequests = $newActiveRequests.Append $request }}
+    {{ else }}
+        {{/* Request expired (>24h) - delete message and notify user */}}
+        {{ $userID := toInt64 $request.UserID }}
+        {{ $primaryRoleID := toInt64 $request.PrimaryRoleID }}
+        {{ $messageID := toInt64 $request.MessageID }}
+        
+        {{/* Delete the request message */}}
+        {{ $msg := getMessage $notificationChannelID $messageID }}
+        {{ if $msg }}
+            {{ deleteMessage $notificationChannelID $messageID 0 }}
+            {{ $timeoutEmbed := cembed
+                "title" "Žádost o přístup do modulu vypršela"
+                "description" (print "<@" $userID ">, tvoje žádost <@&" $primaryRoleID "> nebyla vyřízena do 24 hodin a byla zrušena.\n\nZkus to později nebo přímo kontaktuj zodpovědné osoby <@&" $responsibleRoleID "> a vyšší.")
+                "color" $timeoutColor
+                "timestamp" currentTime
+            }}
+            {{ sendMessage $notificationChannelID (complexMessage "content" (print "<@" $userID ">") "embed" $timeoutEmbed) }}
+        {{ end }}
+    {{ end }}
+{{ end }}
+
+{{/* ============ PROCESS NEW QUERIES FOR REQUESTS ============ */}}
+{{ range $newlyLoadedQueries }}
+    {{ $query := . }}
+    {{ $userID := $query.UserID }}
+    {{ $timestamp := $query.Timestamp }}
+    {{ $unverifiedRoles := $query.UnverifiedRoles }}
+    
+    {{/* ============ PROCESS EACH UNVERIFIED ROLE ============ */}}
+    {{ range $unverifiedRoles }}
+        {{ $unverifiedRoleID := . }}
+        {{ $unverifiedRole := getRole $unverifiedRoleID }}
+        {{ if not $unverifiedRole }}
+            {{ continue }}
+        {{ end }}
+        
+        {{/* Get primary role name (remove "unverified" suffix) */}}
+        {{ $primaryRoleName := reReplace `unverified$` $unverifiedRole.Name "" }}
+        {{ $primaryRole := getRoleName $primaryRoleName }}
+        {{ if not $primaryRole }}
+            {{ continue }} {{/* Primary role not found - skip */}}
+        {{ end }}
+        {{ $primaryRoleID := $primaryRole.ID }}
+        
+        {{/* ============ CHECK FOR DUPLICATE REQUESTS (30 min) ============ */}}
+        {{ $isDuplicate := false }}
+        {{ range $newActiveRequests }}
+            {{ $existingRequest := . }}
+            {{ if and (eq $existingRequest.UserID $userID) (eq (toString $existingRequest.PrimaryRoleID) (toString $primaryRoleID)) }}
+                {{ $requestAge := sub $currentTime (toInt $existingRequest.Timestamp) }}
+                {{ if lt $requestAge $duplicateCheckTime }}
+                    {{ $isDuplicate = true }}
+                    {{ break }}
+                {{ end }}
+            {{ end }}
+        {{ end }}
+        
+        {{ if $isDuplicate }}
+            {{ continue }} {{/* Duplicate found - skip */}}
+        {{ end }}
+        
+        {{/* ============ CREATE REQUEST AND EMBED WITH BUTTONS ============ */}}
+        {{ $member := getMember $userID }}
+        {{ $embed := cembed
+            "title" "Žádost o schválení přístupu"
+            "description" (print "Uživatel " $member.User.Mention " žádá o přístup do modulu " $primaryRole.Mention ".")
+            "color" $embedColor
+            "footer" (sdict "text" (print "User ID: " $userID " | Timeout: 24h"))
+            "timestamp" currentTime
+        }}
+        
+        {{/* Create buttons */}}
+        {{ $approveButton := cbutton "label" "POVOLIT" "style" "success" "custom_id" (print "approve-" $userID "-" $primaryRoleID) }}
+        {{ $rejectButton := cbutton "label" "ZAMÍTNOUT" "style" "danger" "custom_id" (print "reject-" $userID "-" $primaryRoleID) }}
+        
+        {{/* Send message with mention, embed and buttons */}}
+        {{ $msgContent := print "<@" $userID "> " $primaryRole.Mention }}
+        {{ $msgID := sendMessageRetID $notificationChannelID (complexMessage "content" $msgContent "embed" $embed "buttons" (cslice $approveButton $rejectButton)) }}
+        
+        {{/* ============ SAVE TO DATABASE ============ */}}
+        {{ $newRequest := sdict
+            "MessageID" (toString $msgID)
+            "Timestamp" $timestamp
+            "UserID" $userID
+            "PrimaryRoleID" (toString $primaryRoleID)
+            "UnverifiedRoleID" (toString $unverifiedRoleID)
+        }}
+        
+        {{ $newActiveRequests = $newActiveRequests.Append $newRequest }}
+    {{ end }}
+{{ end }}
+
+{{/* ============ SAVE UPDATED DATABASE ============ */}}
+{{ dbSet 0 "module_entry_pending_requests" $newActiveRequests }}
