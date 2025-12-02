@@ -23,6 +23,8 @@ On the restricted channel, everyone’s view permission must be blocked. The unv
 
 Based on the queries received, an embed with buttons is generated. Only the correct roles can approve or deny it. If denied, the user is informed and both roles are removed. If accepted, only the unverified role is removed, leaving the user with full access.
 
+---
+
 There is also so-called request role. This role is applied in the "Channels & Roles" interface in each restricted choice along with other 2 roles. This can be used to show waiting channel where all the requests are bieng processed.
 
 Also, it is good to mention that `process.yag` is too long for the free version of the bot. Just cut off the comments, and it is going to be fine.
