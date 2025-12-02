@@ -31,6 +31,8 @@ Also, it is good to mention that `process.yag` is too long for the free version 
 
 To improve functionality, you can comment out the check for module roles in `create_query_for_request.cc` and configure it to strictly use the command when the request role is triggered only. In this case, it will work more precisely. However, whenever a user clicks on a choice in the "Channels & Roles" interface, they must be assigned all three roles, including the request role.
 
+Request to a specific module can be done once per `$requestExpiryTime`. If a user leaves and tries to send a new request, it is possible only after the expiry time in the current implementation.
+
 ---
 
 `process.yag` - Trigger: `Interval`, `5min`

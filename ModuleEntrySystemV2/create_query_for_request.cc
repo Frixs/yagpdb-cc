@@ -21,7 +21,7 @@ $endIf
 // ============ SEND USER NOTIFICATION ============
 $channelSendMessage[$get[notificationChannelID];
 <@$authorID>
-{description:Tvé aktuální žádosti o přístup jsou zaregistrovány a vytvoří se do pár minut.}
+{description:Tvé případně nové žádosti o přístup se registrují a vytvoří se do pár minut.}
 {color:#3694e7}
 {delete:120000}
 ;no]
@@ -83,7 +83,7 @@ $if[$get[timeSince]>$get[getMessageCooldown]&&$get[timeoutRunning]==false]
 	$endIf
 
 	// Update the database message with the new content
-	$editMessage[$get[databaseMessageID];$get[newContent]]
+	$editMessage[$get[databaseMessageID];$get[newContent];$get[databaseChannelID]]
 
 $else
 	// COOLDOWN ACTIVE - USE BUFFER
@@ -147,7 +147,7 @@ $else
 			$setServerVar[db_timeout_flag;false]
 		
 			// Update the database message with the new content
-			$editMessage[$get[databaseMessageID];$get[newContent]]
+			$editMessage[$get[databaseMessageID];$get[newContent];$get[databaseChannelID]]
 			// When the edit overflows 2k characters, it will throw an error.
 		$endTimeout
 		// === === === === === === === === === === === ===
