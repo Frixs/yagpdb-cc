@@ -71,7 +71,7 @@
         "author" (sdict "name" $targetMember.User.String "icon_url" $avatar)
         "timestamp" currentTime
     }}
-    {{ sendResponse $logChannelID (complexMessage "embed" $logEmbed) }}
+    {{ sendMessage $logChannelID (complexMessage "embed" $logEmbed) }}
     
     {{/* Delete original request message */}}
     {{ deleteMessage nil .Message.ID 0 }}
@@ -96,7 +96,7 @@
         "timestamp" currentTime
     }}
     
-    {{ sendResponse $logChannelID (complexMessage "embed" $logEmbed) }}
+    {{ sendMessage $logChannelID (complexMessage "embed" $logEmbed) }}
     
     {{/* Delete original request message */}}
     {{ deleteMessage nil .Message.ID 0 }}

@@ -7,9 +7,9 @@
 {{ $reactionEmoji := "👍" }} {{/* indicates database message was read */}}
 {{ $databaseHeader := "**[CUSTOMCOMMANDS_AND_YAGPDB_MODULE_ENTRY_DATABASE]**" }}
 {{ $databaseHeaderRegex := `(\*\*\[CUSTOMCOMMANDS_AND_YAGPDB_MODULE_ENTRY_DATABASE\]\*\*)` }}
-{{ $duplicateCheckTime := 1800 }} {{/* 30 minutes in seconds */}}
 {{ $roleRemovalTime := 300 }} {{/* 5 minutes in seconds */}}
-{{ $requestExpiryTime := 86400 }} {{/* 24 hours in seconds */}}
+{{ $duplicateCheckTime := 1800 }} {{/* 30 minutes in seconds; should be greater than role removal time */}}
+{{ $requestExpiryTime := 86400 }} {{/* 24 hours in seconds; should be greater than duplicate check time */}}
 {{ $embedColor := 0xFFFFFF }}
 {{ $timeoutColor := 0xFF9900 }}
 

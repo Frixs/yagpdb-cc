@@ -21,7 +21,7 @@ $endIf
 // ============ SEND USER NOTIFICATION ============
 $channelSendMessage[$get[notificationChannelID];
 <@$authorID>
-{description:Tvoje žádost o přístup byla zaregistrována a bude vytvořena do několika minut.}
+{description:Tvé aktuální žádosti o přístup jsou zaregistrovány a vytvoří se do pár minut.}
 {color:#3694e7}
 {delete:120000}
 ;no]

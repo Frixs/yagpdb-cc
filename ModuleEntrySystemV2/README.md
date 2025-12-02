@@ -25,6 +25,10 @@ Based on the queries received, an embed with buttons is generated. Only the corr
 
 There is also so-called request role. This role is applied in the "Channels & Roles" interface in each restricted choice along with other 2 roles. This can be used to show waiting channel where all the requests are bieng processed.
 
+Also, it is good to mention that `process.yag` is too long for the free version of the bot. Just cut off the comments, and it is going to be fine.
+
+To improve functionality, you can comment out the check for module roles in `create_query_for_request.cc` and configure it to strictly use the command when the request role is triggered only. In this case, it will work more precisely. However, whenever a user clicks on a choice in the "Channels & Roles" interface, they must be assigned all three roles, including the request role.
+
 ---
 
 `process.yag` - Trigger: `Interval`, `5min`
