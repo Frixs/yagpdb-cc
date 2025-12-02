@@ -11,6 +11,7 @@
 {{/* ============ CONFIGURATION ============ */}}
 {{ $logChannelID := 1442546776492998763 }} {{/* Channel for log messages */}}
 {{ $requestRoleID := 1444276092616708268 }} {{/* Role ID that allows sending requests */}}
+{{ $moderatorRoleID := 322786608766124032 }} {{/* He can accept it even if he is not in the module */}}
 {{ $embedColor := 0x3694E7 }}
 
 {{/* ============ PARSE BUTTON CUSTOM ID ============ */}}
@@ -42,10 +43,18 @@
 {{ $unverifiedRoleID := $unverifiedRole.ID }}
 
 {{/* ============ PERMISSION CHECK ============ */}}
-{{/* User clicking button must have the primary role */}}
-{{ if not (targetHasRoleID .User.ID $primaryRoleID) }}
-    {{ sendResponse nil (complexMessage "content" "❌ Nemáš oprávnění rozhodovat o tomto přístupu!" "reply" .Interaction.Message.ID "ephemeral" true) }}
+{{/* User cannot approve/reject their own request (applies to everyone) */}}
+{{ if eq .User.ID $targetUserID }}
+    {{ sendResponse nil (complexMessage "content" "❌ Nemůžeš schvalovat svou vlastní žádost!" "reply" .Interaction.Message.ID "ephemeral" true) }}
     {{ return }}
+{{ end }}
+
+{{/* Non-moderators must have the primary role */}}
+{{ if not (targetHasRoleID .User.ID $moderatorRoleID) }}
+    {{ if not (targetHasRoleID .User.ID $primaryRoleID) }}
+        {{ sendResponse nil (complexMessage "content" "❌ Nemáš oprávnění rozhodovat o tomto přístupu!" "reply" .Interaction.Message.ID "ephemeral" true) }}
+        {{ return }}
+    {{ end }}
 {{ end }}
 
 {{/* ============ PROCESS ACTION ============ */}}
