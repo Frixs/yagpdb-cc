@@ -1,0 +1,19 @@
+{{/*
+	Trigger Type: Regex, Regex: .*
+ 
+	Made by @frixs
+ 
+	---
+	Channel/User role restrictions (ignore): Member
+	Only run in the following channels: commands
+*/}}
+
+{{/* Ignore if message is exactly "cactus dance" */}}
+{{ if ne (lower .Message.Content) "cactus dance" }}
+	{{ $msgContent := print "<@" .User.ID ">" }}
+    {{ $embed := cembed
+        "description" "### 🇨🇿\nTohle je ale opravdu důležité...\nMěl bys sis s náma zatancovat **cactus dance**.\nPokud o přístup opravdu stojíš, napiš: `cactus dance`\n### 🇺🇸\nThis is important to gain basic permissions!\nYou should do the **cactus dance** with us.\nIf you really want access, type: `cactus dance`\n⠀"
+      "footer" (sdict "text" "Stačí napsat \"cactus dance\" 🎉")
+    }}
+    {{ sendMessage nil (complexMessage "content" $msgContent "embed" $embed "reply" .Message.ID) }}
+{{ end }}

@@ -1,0 +1,26 @@
+{{/*
+	Trigger Type: Regex, Regex: ^cactus dance$
+ 
+	Made by @frixs
+ 
+	---
+	Channel/User role restrictions (require): None
+	Only run in the following channels: None
+*/}}
+
+{{ $memberRole := 323042921110568960 }} {{/* ID Member role */}}
+{{ $newcomerRole := 1451299903497310318 }} {{/* ID role automatically assigned when entering the server */}}
+
+{{/* Check if user doesn't already have the role */}}
+{{ if not (targetHasRoleID .User.ID $memberRole) }}
+    {{/* Give member role */}}
+    {{ giveRoleID .User.ID $memberRole }}
+    {{/* Remove newcomer role */}}
+    {{ removeRoleID $newcomerRole }}
+{{ end }}
+
+{{/* Send GIF */}}
+{{ $embed := cembed 
+  "image" (sdict "url" "https://media.discordapp.net/attachments/639725322778181632/1446223237326438440/tenor.gif?ex=693333d9&is=6931e259&hm=cbceceb41a65a2d682f2da7adac2b28cd9f1da8fc5a6c7232846aece6be51b19")  
+ }}
+{{ sendMessage nil $embed }}
